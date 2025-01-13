@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import google.generativeai as genai
 
 # Configure Google Generative AI
-genai.configure(api_key="AIzaSyA5CE1G5QOM5NuWbum8ZTJ8FudHYeIEuYk")
+genai.configure(api_key="")
 generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -55,7 +55,7 @@ def process_product_data(url):
     params = {
         "engine": "google_shopping",
         "q": ai_response + " sustainable",
-        "api_key": "5b670ebad651ae61669bb24465ba3b0a58d4b38db17dd45ae9378d4edf6b3457",
+        "api_key": "",
     }
     search = GoogleSearch(params)
     results = search.get_dict().get("shopping_results", [])
