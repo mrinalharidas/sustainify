@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraped Results</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #8cbf7b; /* Light green background for sustainability */
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3a5a40;
+        }
+        h1 {
+            
+            font-size: 2.5rem;
+            color: #3a5a40; /* Deep green for eco-friendly look */
+        }
+        h2 {
+            font-family: 'Arial', sans-serif;
+            font-size: 1.8rem;
+            color: #3a5a40;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #3a5a40;
+        }
+
+        /* Sustainable Product Item List */
+        .product-list {
+            margin-top: 30px;
+        }
+        .product-item {
+            background-color: #ffffff;
+            border: 2px solid #a5d6a7;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .product-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .product-item h4 {
+            font-size: 1.2rem;
+            color: #388e3c;
+            margin-bottom: 10px;
+        }
+        .product-item p {
+            font-size: 1rem;
+            color: #757575;
+            margin-bottom: 15px;
+        }
+        .product-item a {
+            display: inline-block;
+            background-color: #388e3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            
+        }
+        .product-item a:hover {
+            background-color: #66bb6a;
+        }
+
+        /* Pagination Styling */
+        .pagination {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .pagination button {
+            padding: 12px 20px;
+            margin: 0 10px;
+            background-color: #388e3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .pagination button:hover {
+            background-color: #66bb6a;
+        }
+        .pagination button:disabled {
+            background-color: #c8e6c9;
+            cursor: not-allowed;
+        }
+
+        /* No Results Styling */
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recommendations</h1>
+    <h2>{{ title }}</h2>
+    <h3>Sustainable Alternatives</h3>
+
+    {% if csv_data %}
+        <div class="product-list">
+            {% for row in csv_data %}
+                <div class="product-item">
+                    <h4>{{ row.product_name }}</h4>
+                    <p><strong>Price:</strong> {{ row.product_price }}</p>
+                    <a href="{{ row.product_link }}" target="_blank">View Product</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button id="prev-btn" onclick="paginate('prev')">Previous</button>
+            <button id="next-btn" onclick="paginate('next')">Next</button>
+        </div>
+    {% else %}
+        <p class="no-results">No shopping results found for the provided URL.</p>
+    {% endif %}
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 6;
+
+        function paginate(direction) {
+            const totalItems = {{ csv_data|length }};
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            
+            if (direction === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (direction === 'prev' && currentPage > 1) {
+                currentPage--;
+            }
+
+            updatePagination();
+            loadItemsForPage();
+        }
+
+        function updatePagination() {
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === Math.ceil({{ csv_data|length }} / itemsPerPage);
+        }
+
+        function loadItemsForPage() {
+            const items = document.querySelectorAll('.product-item');
+            items.forEach((item, index) => {
+                if (index >= (currentPage - 1) * itemsPerPage && index < currentPage * itemsPerPage) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize pagination
+        window.onload = function() {
+            loadItemsForPage();
+            updatePagination();
+        };
+    </script>
+</body>
+</html>
